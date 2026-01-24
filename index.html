@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0b0b0c" />
+  <title>Trio SMS Menu</title>
+  <style>
+    :root {
+      --bg:#0b0b0c;
+      --text:#f3f3f4;
+      --muted:#b8b8bc;
+      --border:rgba(255,255,255,.10);
+      --accent:rgba(255,215,0,.95);
+      --radius:16px;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      background:linear-gradient(180deg,#070708,var(--bg));
+      color:var(--text);
+    }
+    .wrap{max-width:980px;margin:0 auto;padding:18px 14px 60px}
+    header{
+      position:sticky;top:0;z-index:10;
+      background:rgba(11,11,12,.86);
+      backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+      border-bottom:1px solid var(--border);
+      padding:10px 8px 14px;
+      display:flex;flex-direction:column;gap:10px;
+    }
+    .toprow{display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .h1{font-size:18px;font-weight:750;letter-spacing:.2px}
+    .sub{font-size:12px;color:var(--muted)}
+    .dest{
+      font-size:12px;color:var(--muted);
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.04);
+      padding:8px 10px;border-radius:999px;white-space:nowrap;
+    }
+    .search input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.05);
+      color:var(--text);
+      outline:none;
+      font-size:15px;
+    }
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tab{
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.04);
+      color:var(--muted);
+      padding:9px 10px;border-radius:999px;
+      font-size:13px;cursor:pointer;user-select:none;
+    }
+    .tab.active{
+      color:var(--text);
+      border-color:rgba(255,255,255,.22);
+      background:rgba(255,255,255,.09);
+    }
+    .tab.fav.active{border-color:rgba(255,215,0,.35);background:rgba(255,215,0,.10)}
+    .section{
+      margin-top:16px;
+      padding:14px;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      background:rgba(255,255,255,.03);
+    }
+    .section h2{margin:2px 0 12px;font-size:15px;letter-spacing:.2px}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    @media (min-width:760px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    .card{
+      text-align:left;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
+      border-radius:14px;
+      padding:12px 12px 10px;
+      color:var(--text);
+      cursor:pointer;
+      min-height:74px;
+      display:flex;flex-direction:column;justify-content:space-between;gap:8px;
+      box-shadow:0 10px 22px rgba(0,0,0,.25);
+    }
+    .card:active{transform:translateY(1px);border-color:rgba(255,255,255,.25)}
+    .row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+    .title{font-size:14px;font-weight:650;line-height:1.25}
+    .meta{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .pill{
+      display:inline-flex;align-items:center;
+      padding:6px 9px;font-size:12px;border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.04);
+      font-variant-numeric:tabular-nums;
+    }
+    .star{
+      font-size:18px;line-height:1;
+      color:rgba(255,255,255,.65);
+      padding:2px 4px;border-radius:8px;
+      user-select:none;
+    }
+    .star.on{color:var(--accent)}
+    .star:active{background:rgba(255,255,255,.06)}
+    .hint{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.35}
+    .hidden{display:none !important}
+    .footer{margin-top:16px;font-size:12px;color:rgba(255,255,255,.35);padding:0 6px}
+    .empty{color:var(--muted);font-size:13px;padding:6px 2px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="toprow">
+        <div>
+          <div class="h1">Trio SMS Menu</div>
+          <div class="sub">Alegi comanda → se deschide SMS-ul cu codul gata completat (apoi Send).</div>
+        </div>
+        <div class="dest">Catre: 0745923843, 0757765345, 0754628256</div>
+      </div>
+      <div class="search">
+        <input id="q" type="search" placeholder="Cauta... (ex: O5, T-120, fatty, bolus 0.5, carbs 20)" oninput="applyFilter()" />
+      </div>
+      <div class="tabs">
+        <div class="tab active" data-tab="all" onclick="setTab('all')">Toate</div>
+        <div class="tab fav" data-tab="fav" onclick="setTab('fav')">⭐ Favorite</div>
+        <div class="tab" data-tab="temp" onclick="setTab('temp')">Temp Target</div>
+        <div class="tab" data-tab="override" onclick="setTab('override')">Override</div>
+        <div class="tab" data-tab="bolus" onclick="setTab('bolus')">Bolus</div>
+        <div class="tab" data-tab="carbs" onclick="setTab('carbs')">Carbs</div>
+      </div>
+    </header>
+
+    <div class="section" data-section="fav">
+      <h2>Favorite</h2>
+      <div class="grid" id="favGrid"></div>
+      <div id="favEmpty" class="empty hidden">Nu ai nimic in Favorite. Apasa pe ☆ la o comanda ca sa o salvezi.</div>
+    </div>
+
+    <div class="section" data-section="temp">
+      <h2>Temp Target</h2>
+      <div class="grid">
+
+        <button class="card" data-section="temp" data-code="TTC" data-label="Temp Target Cancel" onclick="sendSMS('TTC')">
+          <div class="row">
+            <div class="title">Temp Target Cancel</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'TTC','Temp Target Cancel','temp')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">TTC</span></div>
+        </button>
+
+        <button class="card" data-section="temp" data-code="T0." data-label="Hipo T-120(15%) / 20 min" onclick="sendSMS('T0.')">
+          <div class="row">
+            <div class="title">Hipo T-120(15%) / 20 min</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'T0.','Hipo T-120(15%) / 20 min','temp')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">T0.</span></div>
+        </button>
+
+        <button class="card" data-section="temp" data-code="T1." data-label="T-85(120%)" onclick="sendSMS('T1.')">
+          <div class="row">
+            <div class="title">T-85(120%)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'T1.','T-85(120%)','temp')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">T1.</span></div>
+        </button>
+
+        <button class="card" data-section="temp" data-code="T2." data-label="T-90(120%)" onclick="sendSMS('T2.')">
+          <div class="row">
+            <div class="title">T-90(120%)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'T2.','T-90(120%)','temp')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">T2.</span></div>
+        </button>
+
+        <button class="card" data-section="temp" data-code="T3." data-label="T-110(86%)" onclick="sendSMS('T3.')">
+          <div class="row">
+            <div class="title">T-110(86%)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'T3.','T-110(86%)','temp')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">T3.</span></div>
+        </button>
+
+        <button class="card" data-section="temp" data-code="T4." data-label="T-120(75%)" onclick="sendSMS('T4.')">
+          <div class="row">
+            <div class="title">T-120(75%)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'T4.','T-120(75%)','temp')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">T4.</span></div>
+        </button>
+
+        <button class="card" data-section="temp" data-code="T5." data-label="T-130(67%)" onclick="sendSMS('T5.')">
+          <div class="row">
+            <div class="title">T-130(67%)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'T5.','T-130(67%)','temp')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">T5.</span></div>
+        </button>
+
+        <button class="card" data-section="temp" data-code="T6." data-label="T-140(60%)" onclick="sendSMS('T6.')">
+          <div class="row">
+            <div class="title">T-140(60%)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'T6.','T-140(60%)','temp')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">T6.</span></div>
+        </button>
+
+        <button class="card" data-section="temp" data-code="T7." data-label="T-160(50%)" onclick="sendSMS('T7.')">
+          <div class="row">
+            <div class="title">T-160(50%)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'T7.','T-160(50%)','temp')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">T7.</span></div>
+        </button>
+
+      </div>
+    </div>
+
+    <div class="section" data-section="override">
+      <h2>Override</h2>
+      <div class="grid">
+
+        <button class="card" data-section="override" data-code="OC" data-label="Override Cancel" onclick="sendSMS('OC')">
+          <div class="row">
+            <div class="title">Override Cancel</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'OC','Override Cancel','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">OC</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O1." data-label="Night T-90(SMB Off)" onclick="sendSMS('O1.')">
+          <div class="row">
+            <div class="title">Night T-90(SMB Off)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O1.','Night T-90(SMB Off)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O1.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O2." data-label="Night T-100(SMB Off)" onclick="sendSMS('O2.')">
+          <div class="row">
+            <div class="title">Night T-100(SMB Off)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O2.','Night T-100(SMB Off)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O2.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O3." data-label="Morning T-110(SMB Off)" onclick="sendSMS('O3.')">
+          <div class="row">
+            <div class="title">Morning T-110(SMB Off)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O3.','Morning T-110(SMB Off)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O3.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O4." data-label="DayTime T-120(SMB Off)" onclick="sendSMS('O4.')">
+          <div class="row">
+            <div class="title">DayTime T-120(SMB Off)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O4.','DayTime T-120(SMB Off)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O4.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O5." data-label="NOW T-90 100%(120/120)" onclick="sendSMS('O5.')">
+          <div class="row">
+            <div class="title">NOW T-90 100%(120/120)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O5.','NOW T-90 100%(120/120)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O5.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O6." data-label="Joaca lejer T-110 90%(30/30)" onclick="sendSMS('O6.')">
+          <div class="row">
+            <div class="title">Joaca lejer T-110 90%(30/30)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O6.','Joaca lejer T-110 90%(30/30)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O6.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O7." data-label="Joaca lejer T-120 80%(15/15)" onclick="sendSMS('O7.')">
+          <div class="row">
+            <div class="title">Joaca lejer T-120 80%(15/15)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O7.','Joaca lejer T-120 80%(15/15)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O7.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O8." data-label="Joaca lejer T-130 70%(15/15)" onclick="sendSMS('O8.')">
+          <div class="row">
+            <div class="title">Joaca lejer T-130 70%(15/15)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O8.','Joaca lejer T-130 70%(15/15)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O8.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O9." data-label="FattyMeal T-90 120%(90/90)" onclick="sendSMS('O9.')">
+          <div class="row">
+            <div class="title">FattyMeal T-90 120%(90/90)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O9.','FattyMeal T-90 120%(90/90)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O9.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O10." data-label="FattyMeal T-90 125%(90/90)" onclick="sendSMS('O10.')">
+          <div class="row">
+            <div class="title">FattyMeal T-90 125%(90/90)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O10.','FattyMeal T-90 125%(90/90)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O10.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O11." data-label="FattyMeal T-90 130%(90/90)" onclick="sendSMS('O11.')">
+          <div class="row">
+            <div class="title">FattyMeal T-90 130%(90/90)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O11.','FattyMeal T-90 130%(90/90)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O11.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O12." data-label="FattyMeal T-90 135%(90/90)" onclick="sendSMS('O12.')">
+          <div class="row">
+            <div class="title">FattyMeal T-90 135%(90/90)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O12.','FattyMeal T-90 135%(90/90)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O12.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O13." data-label="FattyMeal T-90 140%(90/90)" onclick="sendSMS('O13.')">
+          <div class="row">
+            <div class="title">FattyMeal T-90 140%(90/90)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O13.','FattyMeal T-90 140%(90/90)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O13.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O14." data-label="Strong T-90 100%(90/90)" onclick="sendSMS('O14.')">
+          <div class="row">
+            <div class="title">Strong T-90 100%(90/90)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O14.','Strong T-90 100%(90/90)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O14.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O15." data-label="Strong T-90 110%(90/90)" onclick="sendSMS('O15.')">
+          <div class="row">
+            <div class="title">Strong T-90 110%(90/90)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O15.','Strong T-90 110%(90/90)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O15.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O16." data-label="Strong T-90 120%(90/90)" onclick="sendSMS('O16.')">
+          <div class="row">
+            <div class="title">Strong T-90 120%(90/90)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O16.','Strong T-90 120%(90/90)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O16.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O17." data-label="Strong T-90 130%(90/90)" onclick="sendSMS('O17.')">
+          <div class="row">
+            <div class="title">Strong T-90 130%(90/90)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O17.','Strong T-90 130%(90/90)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O17.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O18." data-label="Joaca intens T-140 70%(15/15)" onclick="sendSMS('O18.')">
+          <div class="row">
+            <div class="title">Joaca intens T-140 70%(15/15)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O18.','Joaca intens T-140 70%(15/15)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O18.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O19." data-label="Joaca intens T-150 60%(15/15)" onclick="sendSMS('O19.')">
+          <div class="row">
+            <div class="title">Joaca intens T-150 60%(15/15)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O19.','Joaca intens T-150 60%(15/15)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O19.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O20." data-label="Joaca intens T-160 50%(15/15)" onclick="sendSMS('O20.')">
+          <div class="row">
+            <div class="title">Joaca intens T-160 50%(15/15)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O20.','Joaca intens T-160 50%(15/15)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O20.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O21." data-label="Sport T-140 50%(SMB Off)" onclick="sendSMS('O21.')">
+          <div class="row">
+            <div class="title">Sport T-140 50%(SMB Off)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O21.','Sport T-140 50%(SMB Off)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O21.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O22." data-label="Sport T-140 70%(SMB Off)" onclick="sendSMS('O22.')">
+          <div class="row">
+            <div class="title">Sport T-140 70%(SMB Off)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O22.','Sport T-140 70%(SMB Off)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O22.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O23." data-label="T-85 150%(90/90)" onclick="sendSMS('O23.')">
+          <div class="row">
+            <div class="title">T-85 150%(90/90)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O23.','T-85 150%(90/90)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O23.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O24." data-label="T-110 100%(30/30)" onclick="sendSMS('O24.')">
+          <div class="row">
+            <div class="title">T-110 100%(30/30)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O24.','T-110 100%(30/30)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O24.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O25." data-label="T-120 100%(30/30)" onclick="sendSMS('O25.')">
+          <div class="row">
+            <div class="title">T-120 100%(30/30)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O25.','T-120 100%(30/30)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O25.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O26." data-label="T-130 100%(30/30)" onclick="sendSMS('O26.')">
+          <div class="row">
+            <div class="title">T-130 100%(30/30)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O26.','T-130 100%(30/30)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O26.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O27." data-label="T-150 100%(30/30)" onclick="sendSMS('O27.')">
+          <div class="row">
+            <div class="title">T-150 100%(30/30)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O27.','T-150 100%(30/30)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O27.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O28." data-label="140%" onclick="sendSMS('O28.')">
+          <div class="row">
+            <div class="title">140%</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O28.','140%','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O28.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O29." data-label="150%" onclick="sendSMS('O29.')">
+          <div class="row">
+            <div class="title">150%</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O29.','150%','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O29.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O30." data-label="McDonald&#39;s T-90 130%(120/120)" onclick="sendSMS('O30.')">
+          <div class="row">
+            <div class="title">McDonald&#39;s T-90 130%(120/120)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O30.','McDonald&#39;s T-90 130%(120/120)','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O30.</span></div>
+        </button>
+
+        <button class="card" data-section="override" data-code="O31." data-label="New Leg - 120%" onclick="sendSMS('O31.')">
+          <div class="row">
+            <div class="title">New Leg - 120%</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O31.','New Leg - 120%','override')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O31.</span></div>
+        </button>
+
+      </div>
+    </div>
+
+    <div class="section" data-section="bolus">
+      <h2>Bolus</h2>
+      <div class="grid">
+
+        <button class="card" data-section="bolus" data-code="BOLUS_0.1" data-label="trio bolus 0.1" onclick="sendSMS('BOLUS_0.1')">
+          <div class="row">
+            <div class="title">trio bolus 0.1</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'BOLUS_0.1','trio bolus 0.1','bolus')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">BOLUS_0.1</span></div>
+        </button>
+
+        <button class="card" data-section="bolus" data-code="BOLUS_0.2" data-label="trio bolus 0.2" onclick="sendSMS('BOLUS_0.2')">
+          <div class="row">
+            <div class="title">trio bolus 0.2</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'BOLUS_0.2','trio bolus 0.2','bolus')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">BOLUS_0.2</span></div>
+        </button>
+
+        <button class="card" data-section="bolus" data-code="BOLUS_0.3" data-label="trio bolus 0.3" onclick="sendSMS('BOLUS_0.3')">
+          <div class="row">
+            <div class="title">trio bolus 0.3</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'BOLUS_0.3','trio bolus 0.3','bolus')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">BOLUS_0.3</span></div>
+        </button>
+
+        <button class="card" data-section="bolus" data-code="BOLUS_0.4" data-label="trio bolus 0.4" onclick="sendSMS('BOLUS_0.4')">
+          <div class="row">
+            <div class="title">trio bolus 0.4</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'BOLUS_0.4','trio bolus 0.4','bolus')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">BOLUS_0.4</span></div>
+        </button>
+
+        <button class="card" data-section="bolus" data-code="BOLUS_0.5" data-label="trio bolus 0.5" onclick="sendSMS('BOLUS_0.5')">
+          <div class="row">
+            <div class="title">trio bolus 0.5</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'BOLUS_0.5','trio bolus 0.5','bolus')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">BOLUS_0.5</span></div>
+        </button>
+
+        <button class="card" data-section="bolus" data-code="BOLUS_1" data-label="trio bolus 1" onclick="sendSMS('BOLUS_1')">
+          <div class="row">
+            <div class="title">trio bolus 1</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'BOLUS_1','trio bolus 1','bolus')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">BOLUS_1</span></div>
+        </button>
+
+        <button class="card" data-section="bolus" data-code="BOLUS_2" data-label="trio bolus 2" onclick="sendSMS('BOLUS_2')">
+          <div class="row">
+            <div class="title">trio bolus 2</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'BOLUS_2','trio bolus 2','bolus')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">BOLUS_2</span></div>
+        </button>
+
+        <button class="card" data-section="bolus" data-code="BOLUS_3" data-label="trio bolus 3" onclick="sendSMS('BOLUS_3')">
+          <div class="row">
+            <div class="title">trio bolus 3</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'BOLUS_3','trio bolus 3','bolus')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">BOLUS_3</span></div>
+        </button>
+
+        <button class="card" data-section="bolus" data-code="BOLUS_4" data-label="trio bolus 4" onclick="sendSMS('BOLUS_4')">
+          <div class="row">
+            <div class="title">trio bolus 4</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'BOLUS_4','trio bolus 4','bolus')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">BOLUS_4</span></div>
+        </button>
+
+        <button class="card" data-section="bolus" data-code="BOLUS_5" data-label="trio bolus 5" onclick="sendSMS('BOLUS_5')">
+          <div class="row">
+            <div class="title">trio bolus 5</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'BOLUS_5','trio bolus 5','bolus')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">BOLUS_5</span></div>
+        </button>
+
+      </div>
+    </div>
+
+    <div class="section" data-section="carbs">
+      <h2>Add Carbs</h2>
+      <div class="grid">
+
+        <button class="card" data-section="carbs" data-code="CARBS_5" data-label="trio carbs 5" onclick="sendSMS('CARBS_5')">
+          <div class="row">
+            <div class="title">trio carbs 5</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'CARBS_5','trio carbs 5','carbs')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">CARBS_5</span></div>
+        </button>
+
+        <button class="card" data-section="carbs" data-code="CARBS_10" data-label="trio carbs 10" onclick="sendSMS('CARBS_10')">
+          <div class="row">
+            <div class="title">trio carbs 10</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'CARBS_10','trio carbs 10','carbs')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">CARBS_10</span></div>
+        </button>
+
+        <button class="card" data-section="carbs" data-code="CARBS_20" data-label="trio carbs 20" onclick="sendSMS('CARBS_20')">
+          <div class="row">
+            <div class="title">trio carbs 20</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'CARBS_20','trio carbs 20','carbs')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">CARBS_20</span></div>
+        </button>
+
+        <button class="card" data-section="carbs" data-code="CARBS_30" data-label="trio carbs 30" onclick="sendSMS('CARBS_30')">
+          <div class="row">
+            <div class="title">trio carbs 30</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'CARBS_30','trio carbs 30','carbs')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">CARBS_30</span></div>
+        </button>
+
+        <button class="card" data-section="carbs" data-code="CARBS_40" data-label="trio carbs 40" onclick="sendSMS('CARBS_40')">
+          <div class="row">
+            <div class="title">trio carbs 40</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'CARBS_40','trio carbs 40','carbs')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">CARBS_40</span></div>
+        </button>
+
+        <button class="card" data-section="carbs" data-code="CARBS_50" data-label="trio carbs 50" onclick="sendSMS('CARBS_50')">
+          <div class="row">
+            <div class="title">trio carbs 50</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'CARBS_50','trio carbs 50','carbs')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">CARBS_50</span></div>
+        </button>
+
+        <button class="card" data-section="carbs" data-code="CARBS_60" data-label="trio carbs 60" onclick="sendSMS('CARBS_60')">
+          <div class="row">
+            <div class="title">trio carbs 60</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'CARBS_60','trio carbs 60','carbs')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">CARBS_60</span></div>
+        </button>
+
+        <button class="card" data-section="carbs" data-code="CARBS_70" data-label="trio carbs 70" onclick="sendSMS('CARBS_70')">
+          <div class="row">
+            <div class="title">trio carbs 70</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'CARBS_70','trio carbs 70','carbs')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">CARBS_70</span></div>
+        </button>
+
+      </div>
+      <div class="hint">iOS nu permite trimiterea automata a SMS-ului dintr-o pagina web; dupa deschidere, apesi tu Send.</div>
+    </div>
+
+    <div class="footer">Tip: Add to Home Screen ca sa se comporte ca o aplicatie (fara bara de adrese).</div>
+  </div>
+
+<script>
+  // Destinatari FIXI:
+  // Raul: 0745923843
+  // Gina: 0757765345
+  // Eve:  0754628256
+  const PHONE = "0745923843,0757765345,0754628256";
+
+  const FAV_KEY = "trio_sms_favs_v1";
+  let currentTab = "all";
+
+  function loadFavs() {
+    try {
+      const raw = localStorage.getItem(FAV_KEY);
+      const obj = raw ? JSON.parse(raw) : {};
+      return (obj && typeof obj === "object") ? obj : {};
+    } catch(e) { return {}; }
+  }
+  function saveFavs(favs) { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); }
+
+  let favs = loadFavs();
+
+  function sendSMS(code) {
+    const body = encodeURIComponent(code);
+    const url = `sms:${PHONE}&body=${body}`;
+    window.location.href = url;
+  }
+
+  function toggleFav(ev, code, label, section) {
+    ev.stopPropagation();
+    if (favs[code]) delete favs[code];
+    else favs[code] = { code, label, section };
+    saveFavs(favs);
+    syncStars();
+    renderFavs();
+    applyFilter();
+  }
+
+  function syncStars() {
+    document.querySelectorAll('.card .star').forEach(star => {
+      const btn = star.closest('.card');
+      const code = btn?.dataset?.code;
+      if (!code) return;
+      const isOn = !!favs[code];
+      star.classList.toggle('on', isOn);
+      star.textContent = isOn ? '★' : '☆';
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'","&#39;");
+  }
+
+  function renderFavs() {
+    const grid = document.getElementById('favGrid');
+    const empty = document.getElementById('favEmpty');
+    grid.innerHTML = "";
+    const items = Object.values(favs);
+    if (!items.length) {
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+    const order = { temp: 1, override: 2, bolus: 3, carbs: 4 };
+    items.sort((a,b)=> (order[a.section]||99)-(order[b.section]||99) || a.label.localeCompare(b.label));
+    items.forEach(it => {
+      const btn = document.createElement('button');
+      btn.className = 'card';
+      btn.dataset.section = 'fav';
+      btn.dataset.code = it.code;
+      btn.dataset.label = it.label;
+      btn.onclick = () => sendSMS(it.code);
+      btn.innerHTML = `
+        <div class="row">
+          <div class="title">${escapeHtml(it.label)}</div>
+          <div class="star on" onclick="toggleFav(event,'${escapeHtml(it.code)}','${escapeHtml(it.label)}','${escapeHtml(it.section)}')">★</div>
+        </div>
+        <div class="meta"><span class="pill">${escapeHtml(it.code)}</span></div>
+      `;
+      grid.appendChild(btn);
+    });
+  }
+
+  function setTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+    applyFilter();
+  }
+
+  function applyFilter() {
+    const q = (document.getElementById('q').value || "").trim().toLowerCase();
+
+    document.querySelectorAll('.section').forEach(sec => {
+      const secName = sec.dataset.section;
+      const secAllowed = (currentTab === "all") || (currentTab === secName);
+      sec.classList.toggle('hidden', !secAllowed);
+    });
+
+    document.querySelectorAll('button.card').forEach(btn => {
+      const sec = btn.dataset.section;
+      const inTab = (currentTab === "all") || (sec === currentTab);
+      const code = (btn.dataset.code || "").toLowerCase();
+      const label = (btn.dataset.label || "").toLowerCase();
+      const match = (!q) || (code + " " + label).includes(q);
+      btn.classList.toggle('hidden', !(inTab && match));
+    });
+
+    if (q) {
+      document.querySelectorAll('.section').forEach(sec => {
+        const secName = sec.dataset.section;
+        if (currentTab !== "all" && secName !== currentTab) return;
+        const anyVisible = Array.from(sec.querySelectorAll('button.card')).some(b => !b.classList.contains('hidden'));
+        sec.classList.toggle('hidden', !anyVisible);
+      });
+    }
+
+    const favEmpty = document.getElementById('favEmpty');
+    if (currentTab === "fav" || currentTab === "all") {
+      const anyFavVisible = Array.from(document.querySelectorAll('[data-section="fav"] button.card')).some(b => !b.classList.contains('hidden'));
+      const hasFavs = Object.keys(favs).length > 0;
+      favEmpty.classList.toggle('hidden', hasFavs || anyFavVisible);
+    }
+  }
+
+  syncStars();
+  renderFavs();
+  applyFilter();
+</script>
+</body>
+</html>
