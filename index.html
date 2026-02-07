@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#0b0b0c" />
   <title>Trio SMS Menu</title>
   <style>
-    :root {
+    :root{
       --bg:#0b0b0c;
       --text:#f3f3f4;
       --muted:#b8b8bc;
@@ -24,7 +24,6 @@
       color:var(--text);
     }
     .wrap{max-width:980px;margin:0 auto;padding:18px 14px 60px}
-
     header{
       position:sticky;top:0;z-index:10;
       background:rgba(11,11,12,.86);
@@ -33,628 +32,625 @@
       padding:10px 8px 14px;
       display:flex;flex-direction:column;gap:10px;
     }
-    header .top{
-      display:flex;align-items:flex-end;justify-content:space-between;gap:10px;
-    }
-    header h1{margin:0;font-size:20px;line-height:1.1}
-    header .hint{margin:0;color:var(--muted);font-size:13px;line-height:1.25}
-
-    .to{
-      display:flex;align-items:center;gap:8px;
-      padding:10px 12px;
-      border-radius:12px;
-      background:rgba(255,255,255,.05);
-      border:1px solid var(--border);
-      color:var(--muted);
-      font-size:13px;
-      overflow:hidden;
-    }
-    .to .pill{
+    .toprow{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+    .h1{font-weight:700;font-size:20px;letter-spacing:.2px}
+    .sub{color:rgba(255,255,255,.55);font-size:12px;margin-top:2px}
+    .dest{color:rgba(255,255,255,.65);font-size:13px;white-space:nowrap}
+    .search{display:flex;gap:10px;align-items:center}
+    input[type="search"]{
+      width:100%;
       background:rgba(255,255,255,.06);
       border:1px solid var(--border);
-      color:var(--text);
-      padding:6px 9px;border-radius:999px;
-      font-size:12px;
-      white-space:nowrap;
-    }
-    .to .nums{
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      opacity:.9;
-    }
-
-    .search input{
-      width:100%;
-      padding:12px;
-      border-radius:12px;
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.05);
+      border-radius:999px;
+      padding:12px 14px;
+      font-size:15px;
       color:var(--text);
       outline:none;
-      font-size:15px;
     }
-
-    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    input[type="search"]::placeholder{color:rgba(255,255,255,.35)}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
     .tab{
+      padding:10px 12px;border-radius:999px;
       border:1px solid var(--border);
       background:rgba(255,255,255,.04);
-      color:var(--muted);
-      padding:9px 10px;border-radius:999px;
-      font-size:13px;cursor:pointer;
+      color:rgba(255,255,255,.75);
+      font-size:13px;
+      cursor:pointer;
+      user-select:none;
     }
     .tab.active{
       color:var(--text);
-      border-color:rgba(255,255,255,.22);
-      background:rgba(255,255,255,.09);
+      background:rgba(255,215,0,.12);
+      border-color:rgba(255,215,0,.20);
     }
-    .tab.fav.active{border-color:rgba(255,215,0,.35);background:rgba(255,215,0,.10)}
-
-    .section{
-      margin-top:16px;
-      padding:14px;
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      background:rgba(255,255,255,.03);
+    .tab.fav{display:flex;gap:6px;align-items:center}
+    .section{margin-top:18px}
+    .section h2{
+      margin:0 0 10px;
+      font-size:16px;font-weight:700;
+      color:rgba(255,255,255,.85);
     }
-    .section h2{margin:2px 0 12px;font-size:15px}
     .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-    @media (min-width:760px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media(min-width:720px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media(min-width:920px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
     button.card{
       width:100%;
       text-align:left;
       border:1px solid var(--border);
-      background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
-      border-radius:14px;
-      padding:12px;
+      background:rgba(255,255,255,.05);
+      color:var(--text);
+      border-radius:var(--radius);
+      padding:12px 12px 10px;
       cursor:pointer;
-      color:inherit;
+      position:relative;
     }
-    .row{display:flex;justify-content:space-between;gap:10px}
-    .title{font-size:14px;font-weight:650}
-    .code{
-      display:inline-flex;align-items:center;
-      padding:6px 9px;font-size:12px;border-radius:999px;
+    button.card:active{transform:scale(.99)}
+    .row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .title{font-weight:700;font-size:15px;line-height:1.1}
+    .meta{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.18);
+      padding:6px 8px;
+      border-radius:999px;
+      font-size:12px;
+      color:rgba(255,255,255,.82);
+      letter-spacing:.2px;
+    }
+    .star{
+      width:26px;height:26px;border-radius:8px;
       border:1px solid var(--border);
       background:rgba(255,255,255,.04);
-      margin-top:8px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:16px;
+      color:rgba(255,255,255,.65);
+      flex:0 0 auto;
+      cursor:pointer;
+      user-select:none;
     }
-    .star{font-size:18px;color:rgba(255,255,255,.65)}
-    .star.on{color:var(--accent)}
-    .hidden{display:none!important}
-    .empty{color:var(--muted);font-size:13px}
+    .star.on{color:var(--accent);border-color:rgba(255,215,0,.25);background:rgba(255,215,0,.10)}
+    .hint{margin-top:14px;color:rgba(255,255,255,.45);font-size:12px}
+    .footer{margin-top:18px;color:rgba(255,255,255,.35);font-size:12px}
+    .hidden{display:none !important}
+    .empty{color:var(--muted);font-size:13px;padding:6px 2px}
 
-    /* FIX 1: ascundem header-ul mare de sus */
-    header{display:none!important;}
+    /* --- Controls (Expeditor / Destinatar) --- */
+    .controls{margin-top:10px;display:flex;flex-direction:column;gap:10px}
+    .ctrlRow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .label{color:rgba(255,255,255,.55);font-size:12px;min-width:80px}
+    .seg{display:flex;gap:6px}
+    .seg button{
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:13px;
+      cursor:pointer;
+    }
+    .seg button.active{background:rgba(255,215,0,.14);border-color:rgba(255,215,0,.25)}
+    .seg button:active{transform:scale(.99)}
 
-    /* FIX 2: selector expeditor (ocupă foarte puțin spațiu) */
-    .sender{
+    /* --- Pending bar --- */
+    .pending{
+      position:sticky;
+      top:0;
+      z-index:20;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.06);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
-      margin:10px 0 12px;
     }
-    .sender .label{
-      color:var(--muted);
-      font-size:13px;
-    }
-    .seg{
-      display:inline-flex;
+    .pendingBtns{display:flex;gap:8px}
+    .pendingText{color:var(--text);font-size:13px}
+    .pendingBtn{
       border:1px solid var(--border);
-      border-radius:999px;
-      overflow:hidden;
-      background:rgba(255,255,255,.04);
-    }
-    .seg button{
-      appearance:none;
-      border:0;
-      padding:8px 12px;
-      font-size:13px;
-      color:var(--muted);
-      background:transparent;
-      cursor:pointer;
-    }
-    .seg button.active{
+      background:rgba(255,255,255,.08);
       color:var(--text);
-      background:rgba(255,255,255,.10);
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:13px;
+      cursor:pointer;
+      white-space:nowrap;
     }
+    .pendingBtn.secondary{background:transparent;color:rgba(255,255,255,.55)}
   </style>
 </head>
-
 <body>
-  <header>
-    <div class="top">
-      <h1>Trio SMS Menu</h1>
-    </div>
-    <p class="hint">
-      Alegi comanda -> se deschide SMS-ul cu codul gata completat (apoi Send).
-    </p>
-    <div class="to">
-      <span class="pill">Catre:</span>
-      <span class="nums">0754628256</span>
-    </div>
-  </header>
-
   <div class="wrap">
-      <div class="search">
-        <input id="q" type="search" placeholder="Cauta... (ex: O5, T-120, fatty, bolus 0.5, carbs 20)" oninput="applyFilter()" />
+    <header>
+      <div class="toprow">
+        <div>
+          <div class="h1">Trio SMS Menu</div>
+          <div class="sub">Alegi comanda → se deschide SMS-ul cu codul gata completat (apoi Send).</div>
+        </div>
+
+        <div class="controls">
+          <div class="ctrlRow">
+            <div class="label">Expeditor:</div>
+            <div class="seg" role="group" aria-label="Expeditor">
+              <button type="button" id="meRaul">Raul</button>
+              <button type="button" id="meGina">Gina</button>
+            </div>
+          </div>
+
+          <div class="ctrlRow">
+            <div class="label">Destinatar:</div>
+            <div class="seg" role="group" aria-label="Destinatar">
+              <button type="button" id="toEve">Eve</button>
+              <button type="button" id="toGina">Gina</button>
+              <button type="button" id="toBoth">Ambele</button>
+            </div>
+          </div>
+
+          <div id="pendingBar" class="pending hidden">
+            <div class="pendingText" id="pendingText">Mai ai un mesaj de trimis.</div>
+            <div class="pendingBtns">
+              <button type="button" id="sendSecond" class="pendingBtn">Trimite acum</button>
+              <button type="button" id="dismissSecond" class="pendingBtn secondary">Mai tarziu</button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="sender">
-        <div class="label">Expeditor:</div>
-        <div class="seg" role="group" aria-label="Expeditor">
-          <button type="button" id="meRaul">Raul</button>
-          <button type="button" id="meGina">Gina</button>
-        </div>
+      <div class="search">
+        <input id="q" type="search" placeholder="Cauta... (ex: O5, T-120, fatty, bolus 0.5, carbs 20)" oninput="applyFilter()" />
       </div>
 
       <div class="tabs">
         <div class="tab active" data-tab="all" onclick="setTab('all')">Toate</div>
         <div class="tab fav" data-tab="fav" onclick="setTab('fav')">⭐ Favorite</div>
-        <div class="tab" data-tab="temp" onclick="setTab('temp')">Temp Target</div>
-        <div class="tab" data-tab="override" onclick="setTab('override')">Override</div>
+        <div class="tab" data-tab="tt" onclick="setTab('tt')">Temp Target</div>
+        <div class="tab" data-tab="ov" onclick="setTab('ov')">Override</div>
         <div class="tab" data-tab="bolus" onclick="setTab('bolus')">Bolus</div>
         <div class="tab" data-tab="carbs" onclick="setTab('carbs')">Carbs</div>
       </div>
+    </header>
 
-      <div class="section" data-section="fav">
-        <h2>Favorite</h2>
-        <div id="favGrid" class="grid"></div>
-        <div id="favEmpty" class="empty hidden">Nu ai nimic in Favorite. Apasa pe ☆ la o comanda ca sa o salvezi.</div>
+    <!-- FAVORITE -->
+    <div class="section" id="secFav" data-section="fav">
+      <h2>Favorite</h2>
+      <div class="grid" id="favGrid"></div>
+      <div id="favEmpty" class="empty hidden">Nu ai nimic in Favorite. Apasa pe ☆ la o comanda ca sa o salvezi.</div>
+    </div>
+
+    <!-- TEMP TARGET -->
+    <div class="section" data-section="tt">
+      <h2>Temp Target</h2>
+      <div class="grid">
+        <button class="card" data-section="tt" data-code="TTC" data-label="Temp Target Cancel" onclick="sendSMS('TTC')">
+          <div class="row">
+            <div class="title">Temp Target Cancel</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'TTC','Temp Target Cancel','tt')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">TTC</span></div>
+        </button>
+
+        <button class="card" data-section="tt" data-code="T0" data-label="Hipo T-120(15%) / 20 min" onclick="sendSMS('T0')">
+          <div class="row">
+            <div class="title">Hipo T-120(15%) / 20 min</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'T0','Hipo T-120(15%) / 20 min','tt')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">T0</span></div>
+        </button>
+
+        <button class="card" data-section="tt" data-code="T1" data-label="T-85(120%)" onclick="sendSMS('T1')">
+          <div class="row">
+            <div class="title">T-85(120%)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'T1','T-85(120%)','tt')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">T1</span></div>
+        </button>
+
+        <button class="card" data-section="tt" data-code="T2" data-label="T-90(120%)" onclick="sendSMS('T2')">
+          <div class="row">
+            <div class="title">T-90(120%)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'T2','T-90(120%)','tt')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">T2</span></div>
+        </button>
+
+        <button class="card" data-section="tt" data-code="T3" data-label="T-110(86%)" onclick="sendSMS('T3')">
+          <div class="row">
+            <div class="title">T-110(86%)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'T3','T-110(86%)','tt')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">T3</span></div>
+        </button>
+
+        <button class="card" data-section="tt" data-code="T4" data-label="T-120(75%)" onclick="sendSMS('T4')">
+          <div class="row">
+            <div class="title">T-120(75%)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'T4','T-120(75%)','tt')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">T4</span></div>
+        </button>
+
+        <button class="card" data-section="tt" data-code="T5" data-label="T-130(65%)" onclick="sendSMS('T5')">
+          <div class="row">
+            <div class="title">T-130(65%)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'T5','T-130(65%)','tt')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">T5</span></div>
+        </button>
+
+        <button class="card" data-section="tt" data-code="T6" data-label="T-140(57%)" onclick="sendSMS('T6')">
+          <div class="row">
+            <div class="title">T-140(57%)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'T6','T-140(57%)','tt')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">T6</span></div>
+        </button>
+
+        <button class="card" data-section="tt" data-code="T7" data-label="T-150(50%)" onclick="sendSMS('T7')">
+          <div class="row">
+            <div class="title">T-150(50%)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'T7','T-150(50%)','tt')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">T7</span></div>
+        </button>
+
+        <button class="card" data-section="tt" data-code="T8" data-label="T-160(45%)" onclick="sendSMS('T8')">
+          <div class="row">
+            <div class="title">T-160(45%)</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'T8','T-160(45%)','tt')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">T8</span></div>
+        </button>
       </div>
+    </div>
 
-      <div class="section" data-section="temp">
-        <h2>Temp Target</h2>
-        <div class="grid">
-          <button class="card" data-section="temp" data-code="TTC" data-label="Temp Target Cancel" onclick="sendSMS('TTC')">
-            <div class="row">
-              <div class="title">Temp Target Cancel</div>
-              <div class="star" onclick="toggleFav(event,'TTC','Temp Target Cancel','temp')">☆</div>
-            </div>
-            <span class="code">TTC</span>
-          </button>
-
-          <button class="card" data-section="temp" data-code="T0" data-label="Hipo T-120(15%) / 20 min" onclick="sendSMS('T0')">
-            <div class="row">
-              <div class="title">Hipo T-120(15%) / 20 min</div>
-              <div class="star" onclick="toggleFav(event,'T0','Hipo T-120(15%) / 20 min','temp')">☆</div>
-            </div>
-            <span class="code">T0.</span>
-          </button>
-
-          <button class="card" data-section="temp" data-code="T1" data-label="T-85(120%)" onclick="sendSMS('T1')">
-            <div class="row">
-              <div class="title">T-85(120%)</div>
-              <div class="star" onclick="toggleFav(event,'T1','T-85(120%)','temp')">☆</div>
-            </div>
-            <span class="code">T1.</span>
-          </button>
-
-          <button class="card" data-section="temp" data-code="T2" data-label="T-90(120%)" onclick="sendSMS('T2')">
-            <div class="row">
-              <div class="title">T-90(120%)</div>
-              <div class="star" onclick="toggleFav(event,'T2','T-90(120%)','temp')">☆</div>
-            </div>
-            <span class="code">T2.</span>
-          </button>
-
-          <button class="card" data-section="temp" data-code="T3" data-label="T-110(86%)" onclick="sendSMS('T3')">
-            <div class="row">
-              <div class="title">T-110(86%)</div>
-              <div class="star" onclick="toggleFav(event,'T3','T-110(86%)','temp')">☆</div>
-            </div>
-            <span class="code">T3.</span>
-          </button>
-
-          <button class="card" data-section="temp" data-code="T4" data-label="T-120(75%)" onclick="sendSMS('T4')">
-            <div class="row">
-              <div class="title">T-120(75%)</div>
-              <div class="star" onclick="toggleFav(event,'T4','T-120(75%)','temp')">☆</div>
-            </div>
-            <span class="code">T4.</span>
-          </button>
-
-          <button class="card" data-section="temp" data-code="T5" data-label="T-130(65%)" onclick="sendSMS('T5')">
-            <div class="row">
-              <div class="title">T-130(65%)</div>
-              <div class="star" onclick="toggleFav(event,'T5','T-130(65%)','temp')">☆</div>
-            </div>
-            <span class="code">T5.</span>
-          </button>
-
-          <button class="card" data-section="temp" data-code="T6" data-label="T-140(57%)" onclick="sendSMS('T6')">
-            <div class="row">
-              <div class="title">T-140(57%)</div>
-              <div class="star" onclick="toggleFav(event,'T6','T-140(57%)','temp')">☆</div>
-            </div>
-            <span class="code">T6.</span>
-          </button>
-
-          <button class="card" data-section="temp" data-code="T7" data-label="T-150(50%)" onclick="sendSMS('T7')">
-            <div class="row">
-              <div class="title">T-150(50%)</div>
-              <div class="star" onclick="toggleFav(event,'T7','T-150(50%)','temp')">☆</div>
-            </div>
-            <span class="code">T7.</span>
-          </button>
-
-          <button class="card" data-section="temp" data-code="T8" data-label="T-160(45%)" onclick="sendSMS('T8')">
-            <div class="row">
-              <div class="title">T-160(45%)</div>
-              <div class="star" onclick="toggleFav(event,'T8','T-160(45%)','temp')">☆</div>
-            </div>
-            <span class="code">T8.</span>
-          </button>
-
-          <button class="card" data-section="temp" data-code="T9" data-label="T-170(40%)" onclick="sendSMS('T9')">
-            <div class="row">
-              <div class="title">T-170(40%)</div>
-              <div class="star" onclick="toggleFav(event,'T9','T-170(40%)','temp')">☆</div>
-            </div>
-            <span class="code">T9.</span>
-          </button>
-        </div>
+    <!-- OVERRIDE -->
+    <div class="section" data-section="ov">
+      <h2>Override</h2>
+      <div class="grid">
+        <button class="card" data-section="ov" data-code="O0" data-label="Override Cancel" onclick="sendSMS('O0')">
+          <div class="row">
+            <div class="title">Override Cancel</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O0','Override Cancel','ov')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O0</span></div>
+        </button>
+        <button class="card" data-section="ov" data-code="O5" data-label="Override 5" onclick="sendSMS('O5')">
+          <div class="row">
+            <div class="title">Override 5</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'O5','Override 5','ov')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">O5</span></div>
+        </button>
       </div>
+    </div>
 
-      <div class="section" data-section="override">
-        <h2>Override</h2>
-        <div class="grid">
-          <button class="card" data-section="override" data-code="O0" data-label="Override Cancel" onclick="sendSMS('O0')">
-            <div class="row">
-              <div class="title">Override Cancel</div>
-              <div class="star" onclick="toggleFav(event,'O0','Override Cancel','override')">☆</div>
-            </div>
-            <span class="code">OC</span>
-          </button>
+    <!-- BOLUS -->
+    <div class="section" data-section="bolus">
+      <h2>Bolus</h2>
+      <div class="grid">
+        <button class="card" data-section="bolus" data-code="B_05" data-label="bolus 0.5" onclick="sendSMS('B 0.5')">
+          <div class="row">
+            <div class="title">bolus 0.5</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'B_05','bolus 0.5','bolus')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">B 0.5</span></div>
+        </button>
 
-          <button class="card" data-section="override" data-code="O5" data-label="Override 5%" onclick="sendSMS('O5')">
-            <div class="row">
-              <div class="title">Override 5%</div>
-              <div class="star" onclick="toggleFav(event,'O5','Override 5%','override')">☆</div>
-            </div>
-            <span class="code">O5</span>
-          </button>
+        <button class="card" data-section="bolus" data-code="B_10" data-label="bolus 1.0" onclick="sendSMS('B 1.0')">
+          <div class="row">
+            <div class="title">bolus 1.0</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'B_10','bolus 1.0','bolus')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">B 1.0</span></div>
+        </button>
 
-          <button class="card" data-section="override" data-code="O10" data-label="Override 10%" onclick="sendSMS('O10')">
-            <div class="row">
-              <div class="title">Override 10%</div>
-              <div class="star" onclick="toggleFav(event,'O10','Override 10%','override')">☆</div>
-            </div>
-            <span class="code">O10</span>
-          </button>
+        <button class="card" data-section="bolus" data-code="B_15" data-label="bolus 1.5" onclick="sendSMS('B 1.5')">
+          <div class="row">
+            <div class="title">bolus 1.5</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'B_15','bolus 1.5','bolus')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">B 1.5</span></div>
+        </button>
 
-          <button class="card" data-section="override" data-code="O15" data-label="Override 15%" onclick="sendSMS('O15')">
-            <div class="row">
-              <div class="title">Override 15%</div>
-              <div class="star" onclick="toggleFav(event,'O15','Override 15%','override')">☆</div>
-            </div>
-            <span class="code">O15</span>
-          </button>
-
-          <button class="card" data-section="override" data-code="O20" data-label="Override 20%" onclick="sendSMS('O20')">
-            <div class="row">
-              <div class="title">Override 20%</div>
-              <div class="star" onclick="toggleFav(event,'O20','Override 20%','override')">☆</div>
-            </div>
-            <span class="code">O20</span>
-          </button>
-
-          <button class="card" data-section="override" data-code="O25" data-label="Override 25%" onclick="sendSMS('O25')">
-            <div class="row">
-              <div class="title">Override 25%</div>
-              <div class="star" onclick="toggleFav(event,'O25','Override 25%','override')">☆</div>
-            </div>
-            <span class="code">O25</span>
-          </button>
-
-          <button class="card" data-section="override" data-code="O30" data-label="Override 30%" onclick="sendSMS('O30')">
-            <div class="row">
-              <div class="title">Override 30%</div>
-              <div class="star" onclick="toggleFav(event,'O30','Override 30%','override')">☆</div>
-            </div>
-            <span class="code">O30</span>
-          </button>
-
-          <button class="card" data-section="override" data-code="O40" data-label="Override 40%" onclick="sendSMS('O40')">
-            <div class="row">
-              <div class="title">Override 40%</div>
-              <div class="star" onclick="toggleFav(event,'O40','Override 40%','override')">☆</div>
-            </div>
-            <span class="code">O40</span>
-          </button>
-
-          <button class="card" data-section="override" data-code="O50" data-label="Override 50%" onclick="sendSMS('O50')">
-            <div class="row">
-              <div class="title">Override 50%</div>
-              <div class="star" onclick="toggleFav(event,'O50','Override 50%','override')">☆</div>
-            </div>
-            <span class="code">O50</span>
-          </button>
-
-          <button class="card" data-section="override" data-code="O60" data-label="Override 60%" onclick="sendSMS('O60')">
-            <div class="row">
-              <div class="title">Override 60%</div>
-              <div class="star" onclick="toggleFav(event,'O60','Override 60%','override')">☆</div>
-            </div>
-            <span class="code">O60</span>
-          </button>
-
-          <button class="card" data-section="override" data-code="O70" data-label="Override 70%" onclick="sendSMS('O70')">
-            <div class="row">
-              <div class="title">Override 70%</div>
-              <div class="star" onclick="toggleFav(event,'O70','Override 70%','override')">☆</div>
-            </div>
-            <span class="code">O70</span>
-          </button>
-
-          <button class="card" data-section="override" data-code="O80" data-label="Override 80%" onclick="sendSMS('O80')">
-            <div class="row">
-              <div class="title">Override 80%</div>
-              <div class="star" onclick="toggleFav(event,'O80','Override 80%','override')">☆</div>
-            </div>
-            <span class="code">O80</span>
-          </button>
-
-          <button class="card" data-section="override" data-code="O90" data-label="Override 90%" onclick="sendSMS('O90')">
-            <div class="row">
-              <div class="title">Override 90%</div>
-              <div class="star" onclick="toggleFav(event,'O90','Override 90%','override')">☆</div>
-            </div>
-            <span class="code">O90</span>
-          </button>
-
-          <button class="card" data-section="override" data-code="O100" data-label="Override 100%" onclick="sendSMS('O100')">
-            <div class="row">
-              <div class="title">Override 100%</div>
-              <div class="star" onclick="toggleFav(event,'O100','Override 100%','override')">☆</div>
-            </div>
-            <span class="code">O100</span>
-          </button>
-        </div>
+        <button class="card" data-section="bolus" data-code="B_20" data-label="bolus 2.0" onclick="sendSMS('B 2.0')">
+          <div class="row">
+            <div class="title">bolus 2.0</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'B_20','bolus 2.0','bolus')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">B 2.0</span></div>
+        </button>
       </div>
+    </div>
 
-      <div class="section" data-section="bolus">
-        <h2>Bolus</h2>
-        <div class="grid">
-          <button class="card" data-section="bolus" data-code="B0.1" data-label="Bolus 0.1" onclick="sendSMS('B0.1')">
-            <div class="row">
-              <div class="title">Bolus 0.1</div>
-              <div class="star" onclick="toggleFav(event,'B0.1','Bolus 0.1','bolus')">☆</div>
-            </div>
-            <span class="code">B0.1</span>
-          </button>
+    <!-- CARBS -->
+    <div class="section" data-section="carbs">
+      <h2>Carbs</h2>
+      <div class="grid">
+        <button class="card" data-section="carbs" data-code="CH_10" data-label="carbs 10" onclick="sendSMS('10 CH')">
+          <div class="row">
+            <div class="title">carbs 10</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'CH_10','carbs 10','carbs')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">10 CH</span></div>
+        </button>
 
-          <button class="card" data-section="bolus" data-code="B0.2" data-label="Bolus 0.2" onclick="sendSMS('B0.2')">
-            <div class="row">
-              <div class="title">Bolus 0.2</div>
-              <div class="star" onclick="toggleFav(event,'B0.2','Bolus 0.2','bolus')">☆</div>
-            </div>
-            <span class="code">B0.2</span>
-          </button>
+        <button class="card" data-section="carbs" data-code="CH_15" data-label="carbs 15" onclick="sendSMS('15 CH')">
+          <div class="row">
+            <div class="title">carbs 15</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'CH_15','carbs 15','carbs')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">15 CH</span></div>
+        </button>
 
-          <button class="card" data-section="bolus" data-code="B0.3" data-label="Bolus 0.3" onclick="sendSMS('B0.3')">
-            <div class="row">
-              <div class="title">Bolus 0.3</div>
-              <div class="star" onclick="toggleFav(event,'B0.3','Bolus 0.3','bolus')">☆</div>
-            </div>
-            <span class="code">B0.3</span>
-          </button>
+        <button class="card" data-section="carbs" data-code="CH_20" data-label="carbs 20" onclick="sendSMS('20 CH')">
+          <div class="row">
+            <div class="title">carbs 20</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'CH_20','carbs 20','carbs')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">20 CH</span></div>
+        </button>
 
-          <button class="card" data-section="bolus" data-code="B0.4" data-label="Bolus 0.4" onclick="sendSMS('B0.4')">
-            <div class="row">
-              <div class="title">Bolus 0.4</div>
-              <div class="star" onclick="toggleFav(event,'B0.4','Bolus 0.4','bolus')">☆</div>
-            </div>
-            <span class="code">B0.4</span>
-          </button>
+        <button class="card" data-section="carbs" data-code="CH_25" data-label="carbs 25" onclick="sendSMS('25 CH')">
+          <div class="row">
+            <div class="title">carbs 25</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'CH_25','carbs 25','carbs')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">25 CH</span></div>
+        </button>
 
-          <button class="card" data-section="bolus" data-code="B0.5" data-label="Bolus 0.5" onclick="sendSMS('B0.5')">
-            <div class="row">
-              <div class="title">Bolus 0.5</div>
-              <div class="star" onclick="toggleFav(event,'B0.5','Bolus 0.5','bolus')">☆</div>
-            </div>
-            <span class="code">B0.5</span>
-          </button>
+        <button class="card" data-section="carbs" data-code="CH_35" data-label="carbs 35" onclick="sendSMS('35 CH')">
+          <div class="row">
+            <div class="title">carbs 35</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'CH_35','carbs 35','carbs')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">35 CH</span></div>
+        </button>
 
-          <button class="card" data-section="bolus" data-code="B1" data-label="Bolus 1.0" onclick="sendSMS('B1')">
-            <div class="row">
-              <div class="title">Bolus 1.0</div>
-              <div class="star" onclick="toggleFav(event,'B1','Bolus 1.0','bolus')">☆</div>
-            </div>
-            <span class="code">B1</span>
-          </button>
-        </div>
+        <button class="card" data-section="carbs" data-code="CH_45_RB" data-label="45 RB" onclick="sendSMS('45 RB')">
+          <div class="row">
+            <div class="title">45 RB</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'CH_45_RB','45 RB','carbs')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">45 RB</span></div>
+        </button>
+
+        <button class="card" data-section="carbs" data-code="CARBS_70" data-label="trio carbs 70" onclick="sendSMS('trio carbs 70')">
+          <div class="row">
+            <div class="title">trio carbs 70</div>
+            <div class="star" role="button" aria-label="favorite" onclick="toggleFav(event,'CARBS_70','trio carbs 70','carbs')">☆</div>
+          </div>
+          <div class="meta"><span class="pill">CARBS_70</span></div>
+        </button>
       </div>
+      <div class="hint">iOS nu permite trimiterea automata a SMS-ului dintr-o pagina web; dupa deschidere, apesi tu Send.</div>
+    </div>
 
-      <div class="section" data-section="carbs">
-        <h2>Carbs</h2>
-        <div class="grid">
-          <button class="card" data-section="carbs" data-code="C5" data-label="Carbs 5" onclick="sendSMS('C5')">
-            <div class="row">
-              <div class="title">Carbs 5</div>
-              <div class="star" onclick="toggleFav(event,'C5','Carbs 5','carbs')">☆</div>
-            </div>
-            <span class="code">C5</span>
-          </button>
-
-          <button class="card" data-section="carbs" data-code="C10" data-label="Carbs 10" onclick="sendSMS('C10')">
-            <div class="row">
-              <div class="title">Carbs 10</div>
-              <div class="star" onclick="toggleFav(event,'C10','Carbs 10','carbs')">☆</div>
-            </div>
-            <span class="code">C10</span>
-          </button>
-
-          <button class="card" data-section="carbs" data-code="C15" data-label="Carbs 15" onclick="sendSMS('C15')">
-            <div class="row">
-              <div class="title">Carbs 15</div>
-              <div class="star" onclick="toggleFav(event,'C15','Carbs 15','carbs')">☆</div>
-            </div>
-            <span class="code">C15</span>
-          </button>
-
-          <button class="card" data-section="carbs" data-code="C20" data-label="Carbs 20" onclick="sendSMS('C20')">
-            <div class="row">
-              <div class="title">Carbs 20</div>
-              <div class="star" onclick="toggleFav(event,'C20','Carbs 20','carbs')">☆</div>
-            </div>
-            <span class="code">C20</span>
-          </button>
-
-          <button class="card" data-section="carbs" data-code="C25" data-label="Carbs 25" onclick="sendSMS('C25')">
-            <div class="row">
-              <div class="title">Carbs 25</div>
-              <div class="star" onclick="toggleFav(event,'C25','Carbs 25','carbs')">☆</div>
-            </div>
-            <span class="code">C25</span>
-          </button>
-
-          <button class="card" data-section="carbs" data-code="C30" data-label="Carbs 30" onclick="sendSMS('C30')">
-            <div class="row">
-              <div class="title">Carbs 30</div>
-              <div class="star" onclick="toggleFav(event,'C30','Carbs 30','carbs')">☆</div>
-            </div>
-            <span class="code">C30</span>
-          </button>
-        </div>
-      </div>
+    <div class="footer">Tip: Add to Home Screen ca sa se comporte ca o aplicatie (fara bara de adrese).</div>
   </div>
 
 <script>
-  // === NUMERE ===
+  // === Numere ===
   const RAUL_PHONE = "0745923843";
   const GINA_PHONE = "0757765345";
   const EVE_PHONE  = "0754628256";
 
-  // IMPORTANT: iOS/PWA poate trimite către "self" dacă îți incluzi propriul număr la destinatari.
-  // Soluția robustă: NU includem expeditorul, trimitem doar la ceilalți doi.
-  const SENDER_KEY = "trio_sms_sender_v1";
-
-  function getSender() {
-    return localStorage.getItem(SENDER_KEY) || "raul";
-  }
-  function setSender(val) {
-    localStorage.setItem(SENDER_KEY, val);
-    syncSenderUI();
-  }
-  function getRecipients() {
-    const me = getSender();
-    if (me === "gina") return `${RAUL_PHONE};${EVE_PHONE}`;
-    return `${GINA_PHONE};${EVE_PHONE}`; // default Raul
-  }
+  // Storage keys
+  const SENDER_KEY  = "trio_sms_sender_v1";   // raul | gina (doar afisaj)
+  const MODE_KEY    = "trio_sms_mode_v1";     // eve | gina | both
+  const PENDING_KEY = "trio_sms_pending_v1";  // { to:"gina", code:"TTC" }
 
   const FAV_KEY = "trio_sms_favs_v1";
   let currentTab = "all";
-  let favs = JSON.parse(localStorage.getItem(FAV_KEY) || "{}");
 
-  function sendSMS(code) {
-    const body = encodeURIComponent(code);
-    const to = getRecipients();
-    // mai stabil pe iOS decât "&body="
-    const url = `sms:${to}?&body=${body}`;
-    window.location.href = url;
+  function loadFavs() {
+    try {
+      const raw = localStorage.getItem(FAV_KEY);
+      const obj = raw ? JSON.parse(raw) : {};
+      return (obj && typeof obj === "object") ? obj : {};
+    } catch(e) { return {}; }
+  }
+  function saveFavs(favs) { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); }
+
+  let favs = loadFavs();
+
+  function getSender(){ return localStorage.getItem(SENDER_KEY) || "raul"; }
+  function setSender(v){ localStorage.setItem(SENDER_KEY, v); syncSenderUI(); }
+
+  function getMode(){ return localStorage.getItem(MODE_KEY) || "both"; }
+  function setMode(v){ localStorage.setItem(MODE_KEY, v); syncModeUI(); }
+
+  function syncSenderUI(){
+    const s = getSender();
+    document.getElementById("meRaul")?.classList.toggle("active", s==="raul");
+    document.getElementById("meGina")?.classList.toggle("active", s==="gina");
+  }
+  function syncModeUI(){
+    const m = getMode();
+    document.getElementById("toEve")?.classList.toggle("active", m==="eve");
+    document.getElementById("toGina")?.classList.toggle("active", m==="gina");
+    document.getElementById("toBoth")?.classList.toggle("active", m==="both");
+    renderPendingBar();
   }
 
-  function toggleFav(e, code, label, section){
-    e.stopPropagation();
+  function smsTo(number, code){
+    const body = encodeURIComponent(code);
+    window.location.href = `sms:${number}?&body=${body}`;
+  }
+
+  function getPending(){
+    try { return JSON.parse(localStorage.getItem(PENDING_KEY) || "null"); }
+    catch { return null; }
+  }
+  function clearPending(){
+    localStorage.removeItem(PENDING_KEY);
+    renderPendingBar();
+  }
+
+  function renderPendingBar(){
+    const bar = document.getElementById("pendingBar");
+    const txt = document.getElementById("pendingText");
+    if (!bar || !txt) return;
+
+    const p = getPending();
+    if (!p){
+      bar.classList.add("hidden");
+      return;
+    }
+    const who = (p.to === "gina") ? "Gina" : "Eve";
+    txt.textContent = `Mai ai de trimis acelasi mesaj catre ${who}.`;
+    bar.classList.remove("hidden");
+  }
+
+  // Trimitere robusta:
+  // - eve: direct Eve
+  // - gina: direct Gina
+  // - both: PAS 1 Eve, seteaza pending pentru Gina, PAS 2 optional manual
+  function sendSMS(code) {
+    const mode = getMode();
+
+    if (mode === "eve") return smsTo(EVE_PHONE, code);
+    if (mode === "gina") return smsTo(GINA_PHONE, code);
+
+    // both
+    localStorage.setItem(PENDING_KEY, JSON.stringify({ to:"gina", code }));
+    renderPendingBar();
+    return smsTo(EVE_PHONE, code);
+  }
+
+  function toggleFav(ev, code, label, section){
+    ev.stopPropagation();
     if (favs[code]) delete favs[code];
     else favs[code] = { code, label, section };
-    localStorage.setItem(FAV_KEY, JSON.stringify(favs));
-    renderFavs();
+    saveFavs(favs);
     syncStars();
+    renderFavs();
+    applyFilter();
   }
 
-  function renderFavs() {
+  function renderFavs(){
     const g = document.getElementById("favGrid");
-    const empty = document.getElementById("favEmpty");
+    const e = document.getElementById("favEmpty");
+    if (!g || !e) return;
+
     g.innerHTML = "";
     const a = Object.values(favs);
-    if (!a.length) { empty.classList.remove("hidden"); return; }
-    empty.classList.add("hidden");
+    if (!a.length){ e.classList.remove("hidden"); return; }
+    e.classList.add("hidden");
 
-    a.forEach(it => {
-      const b = document.createElement("button");
-      b.className = "card";
-      b.dataset.section = "fav";
-      b.dataset.code = it.code;
-      b.dataset.label = it.label;
-      b.onclick = () => sendSMS(it.code);
-      b.innerHTML = `
+    a.forEach(it=>{
+      const d = document.createElement("button");
+      d.className = "card";
+      d.dataset.section = "fav";
+      d.dataset.code = it.code;
+      d.dataset.label = it.label;
+      d.onclick = () => sendSMS(it.code);
+
+      d.innerHTML = `
         <div class="row">
           <div class="title">${it.label}</div>
-          <div class="star on">*</div>
+          <div class="star on" role="button" aria-label="favorite">★</div>
         </div>
-        <span class="code">${it.code}</span>
+        <div class="meta"><span class="pill">${it.code}</span></div>
       `;
-      g.appendChild(b);
+
+      d.querySelector(".star").onclick = (ev) => toggleFav(ev, it.code, it.label, it.section);
+      g.appendChild(d);
     });
   }
 
   function syncStars(){
-    document.querySelectorAll(".card .star").forEach(s => {
+    document.querySelectorAll(".card .star").forEach(s=>{
       const c = s.closest(".card")?.dataset.code;
       if (!c) return;
-      s.classList.toggle("on", !!favs[c]);
-      s.textContent = favs[c] ? "*" : "☆";
+      const on = !!favs[c];
+      s.classList.toggle("on", on);
+      s.textContent = on ? "★" : "☆";
     });
   }
 
   function setTab(t){
     currentTab = t;
-    document.querySelectorAll(".tab").forEach(x => x.classList.toggle("active", x.dataset.tab === t));
+    document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active", x.dataset.tab===t));
     applyFilter();
   }
 
   function applyFilter(){
-    const q = (document.getElementById("q").value || "").toLowerCase();
+    const q = (document.getElementById("q")?.value || "").trim().toLowerCase();
 
     document.querySelectorAll(".section").forEach(sec => {
-      const ok = currentTab === "all" || sec.dataset.section === currentTab;
-      sec.classList.toggle("hidden", !ok);
-    });
+      const secName = sec.dataset.section;
 
-    document.querySelectorAll("button.card").forEach(btn => {
-      const sec = btn.dataset.section;
-      const inTab = (currentTab === "all") || (sec === currentTab);
-      const code = (btn.dataset.code || "").toLowerCase();
-      const label = (btn.dataset.label || "").toLowerCase();
-      const match = (!q) || (code + " " + label).includes(q);
-      btn.classList.toggle("hidden", !(inTab && match));
-    });
+      // Favorite section e vizibil doar in "fav" sau "all"
+      if (secName === "fav"){
+        const showFav = (currentTab === "fav" || currentTab === "all");
+        sec.classList.toggle("hidden", !showFav);
+        return;
+      }
 
-    if (q) {
-      document.querySelectorAll(".section").forEach(sec => {
-        const secName = sec.dataset.section;
-        if (currentTab !== "all" && secName !== currentTab) return;
-        const anyVisible = Array.from(sec.querySelectorAll("button.card")).some(b => !b.classList.contains("hidden"));
-        sec.classList.toggle("hidden", !anyVisible);
+      const inTab = (currentTab === "all") || (secName === currentTab);
+      if (!inTab) { sec.classList.add("hidden"); return; }
+
+      let anyVisible = false;
+      sec.querySelectorAll("button.card").forEach(btn => {
+        const code = (btn.dataset.code || "").toLowerCase();
+        const label = (btn.dataset.label || "").toLowerCase();
+        const match = (!q) || (code + " " + label).includes(q);
+        btn.classList.toggle("hidden", !match);
+        if (match) anyVisible = true;
       });
-    }
 
-    const favEmpty = document.getElementById("favEmpty");
-    if (currentTab === "fav" || currentTab === "all") {
-      const anyFavVisible = Array.from(document.querySelectorAll('[data-section="fav"] button.card')).some(b => !b.classList.contains("hidden"));
-      const hasFavs = Object.keys(favs).length > 0;
-      favEmpty.classList.toggle("hidden", hasFavs || anyFavVisible);
+      sec.classList.toggle("hidden", !anyVisible);
+    });
+
+    // Favorite grid filter
+    const favGrid = document.getElementById("favGrid");
+    if (favGrid && (currentTab === "fav" || currentTab === "all")){
+      let anyFavVisible = false;
+      favGrid.querySelectorAll("button.card").forEach(btn => {
+        const code = (btn.dataset.code || "").toLowerCase();
+        const label = (btn.dataset.label || "").toLowerCase();
+        const match = (!q) || (code + " " + label).includes(q);
+        btn.classList.toggle("hidden", !match);
+        if (match) anyFavVisible = true;
+      });
+      document.getElementById("favEmpty")?.classList.toggle("hidden", Object.keys(favs).length > 0 && anyFavVisible);
     }
   }
 
-  function syncSenderUI() {
-    const me = getSender();
-    const bR = document.getElementById("meRaul");
-    const bG = document.getElementById("meGina");
-    if (!bR || !bG) return;
-    bR.classList.toggle("active", me === "raul");
-    bG.classList.toggle("active", me === "gina");
-  }
-
+  // UI listeners
   document.getElementById("meRaul")?.addEventListener("click", () => setSender("raul"));
   document.getElementById("meGina")?.addEventListener("click", () => setSender("gina"));
-  syncSenderUI();
 
+  document.getElementById("toEve")?.addEventListener("click", () => setMode("eve"));
+  document.getElementById("toGina")?.addEventListener("click", () => setMode("gina"));
+  document.getElementById("toBoth")?.addEventListener("click", () => setMode("both"));
+
+  document.getElementById("sendSecond")?.addEventListener("click", () => {
+    const p = getPending();
+    if (!p) return;
+    clearPending();
+    smsTo(GINA_PHONE, p.code);
+  });
+
+  document.getElementById("dismissSecond")?.addEventListener("click", () => {
+    document.getElementById("pendingBar")?.classList.add("hidden");
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) renderPendingBar();
+  });
+
+  // init
   syncStars();
   renderFavs();
+  syncSenderUI();
+  syncModeUI();
+  renderPendingBar();
   applyFilter();
 </script>
 </body>
